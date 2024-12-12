@@ -1,0 +1,11 @@
+[package]
+name = "example"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+iced = "0.13"
+verglas = { workspace = true, features = ["index"] }
+
+[build-dependencies]
+verglas = { workspace = true, features = ["forge"] }
