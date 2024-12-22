@@ -9,7 +9,7 @@
 
 ## Introduction
 
-This crate can be added as a build dependency to automatically generate a TrueType font (`.ttf` file) from SVG icons in a directory for use with the [Iced](https://github.com/iced-rs/iced) GUI library. Essentially, it aims to provide the functionality of [`svg2tff`](https://github.com/fontello/svg2ttf) as a pure Rust library.
+This crate can be added as a build dependency to automatically generate a TrueType font (`.ttf` file) from SVG icons in a directory for use with the [Iced](https://github.com/iced-rs/iced) GUI library. Essentially, it aims to provide the functionality of [`svg2ttf`](https://github.com/fontello/svg2ttf) as a pure Rust library.
 
 *This library is currently experimental.*
 
@@ -19,7 +19,7 @@ The name "verglas" refers to a thin layer of transparent ice that forms on surfa
 
 ## Example
 
-The [`example`](https://github.com/kardwen/verglas/tree/main/example) showcases how different SVG icon sets (in particular a subset of [Jam icons](https://github.com/michaelampr/jam) and some custom icons) can be combined into a font and loaded in an Iced app.
+The [example](https://github.com/kardwen/verglas/tree/main/example) showcases how different SVG icon sets (in particular a subset of [Jam icons](https://github.com/michaelampr/jam) and some custom icons) can be combined into a font and loaded in an Iced app.
 
 <img src="verglas-example.png" width="50%">
 
