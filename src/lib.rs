@@ -28,7 +28,7 @@
 //!
 //! Create a [build script] (`build.rs`) to generate your font:
 //!
-//! ```rust,no_run
+//! ```rust,ignore
 //! fn main() {
 //!     println!("cargo::rerun-if-changed=assets/icons/*");
 //!
@@ -53,7 +53,7 @@
 //!
 //! This lets you create a mapping between icon names and unicode values:
 //!
-//! ```rust,no_run
+//! ```rust,ignore
 //! use iced::{
 //!     widget::{text, Text},
 //!     Font,

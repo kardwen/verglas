@@ -67,27 +67,18 @@ pub fn create_glyph(bez_paths: Vec<BezPath>) -> Result<SimpleGlyph, Error> {
 
     for bez_path in bez_paths {
         let mut curve_points = Vec::new();
-        let mut start_svg_point = Point::ZERO;
-        let mut current_svg_point = Point::ZERO;
 
         for element in bez_path.elements() {
             match element {
                 PathEl::MoveTo(svg_point) => {
-                    start_svg_point = *svg_point;
-                    current_svg_point = *svg_point;
-
                     let curve_point = transform.transform_point(svg_point, true);
                     curve_points.push(curve_point);
                 }
                 PathEl::LineTo(svg_point) => {
-                    current_svg_point = *svg_point;
-
                     let curve_point = transform.transform_point(svg_point, true);
                     curve_points.push(curve_point);
                 }
                 PathEl::QuadTo(svg_control_point, svg_point) => {
-                    current_svg_point = *svg_point;
-
                     let curve_control_point = transform.transform_point(svg_control_point, false);
                     let curve_point = transform.transform_point(svg_point, true);
 
@@ -100,11 +91,6 @@ pub fn create_glyph(bez_paths: Vec<BezPath>) -> Result<SimpleGlyph, Error> {
                     ))
                 }
                 PathEl::ClosePath => {
-                    let tolerance: f64 = 1e-5;
-                    if start_svg_point.distance(current_svg_point) > tolerance {
-                        let curve_point = transform.transform_point(&start_svg_point, true);
-                        curve_points.push(curve_point);
-                    }
                     if !curve_points.is_empty() {
                         contours.push(curve_points.clone().into());
                         curve_points.clear();
@@ -124,5 +110,6 @@ pub fn create_glyph(bez_paths: Vec<BezPath>) -> Result<SimpleGlyph, Error> {
         instructions: vec![],
     };
     glyph.recompute_bounding_box();
+
     Ok(glyph)
 }

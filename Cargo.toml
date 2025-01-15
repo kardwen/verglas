@@ -1,13 +1,13 @@
 [package]
 name = "verglas"
-description = "Iced fonts from SVG icons"
-version = "0.1.0"
+description = "🧊 Iced SVG icon font generator"
+version = "0.1.1"
 edition = "2021"
 authors = ["Karl Felix Schewe"]
 readme = "README.md"
 license = "MIT"
 repository = "https://github.com/kardwen/verglas"
-keywords = ["graphics", "gui", "ui"]
+keywords = ["graphics", "gui", "ui", "svg", "ttf"]
 categories = ["gui"]
 
 [package.metadata.docs.rs]
@@ -27,7 +27,7 @@ usvg = { version = "0.44.0", optional = true }
 write-fonts = { version = "0.33.0", optional = true }
 
 [dev-dependencies]
-rstest = "0.23.0"
+rstest = "0.24.0"
 
 [workspace]
 members = ["example"]

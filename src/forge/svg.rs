@@ -1,21 +1,15 @@
-use kurbo::{BezPath, CubicBez, Point, Rect, Shape};
-use usvg::{tiny_skia_path::PathSegment, Group, Node, Options, Tree};
+use kurbo::BezPath;
+use usvg::{Group, Node, Options, Tree};
 
+mod bezier;
+
+pub use self::bezier::bounding_box;
+
+use self::bezier::process_svg_path;
 use crate::Error;
 
-const ACCURACY: f64 = 0.01;
-
-/// Returns the smallest rectangle that encloses all Bézier paths.
-pub fn bounding_box(bez_paths: &[BezPath]) -> Rect {
-    bez_paths
-        .iter()
-        .map(|bez_path| bez_path.bounding_box())
-        .reduce(|bbox1, bbox2| bbox1.union(bbox2))
-        .unwrap_or(Rect::ZERO)
-}
-
-/// Simplifies an SVG expression with `usvg` and returns a `kurbo` Bézier curve
-/// where cubic segments have been replaced with quadratic segments.
+/// Simplifies an SVG expression with `usvg` and returns a list of Bézier curves.
+/// All cubic curve segments are replaced with quadratic segments.
 pub fn simplify_svg(svg_data: String) -> Result<Vec<BezPath>, Error> {
     // Simplify SVG with usvg
     let opt = Options::default();
@@ -44,52 +38,39 @@ fn visit_group(group: &Group, bez_paths: &mut Vec<BezPath>) {
     }
 }
 
-fn process_svg_path(svg_path: &usvg::Path) -> Option<BezPath> {
-    let path_data = svg_path.data();
-    let mut bez_path = BezPath::new();
-    let mut current_point = Point::ZERO;
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use kurbo::Rect;
 
-    for segment in path_data.segments() {
-        match segment {
-            PathSegment::MoveTo(point) => {
-                current_point = Point::new(point.x as f64, point.y as f64);
-                bez_path.move_to((point.x as f64, point.y as f64));
-            }
-            PathSegment::LineTo(point) => {
-                current_point = Point::new(point.x as f64, point.y as f64);
-                bez_path.line_to((point.x as f64, point.y as f64));
-            }
-            PathSegment::QuadTo(c1, point) => {
-                current_point = Point::new(point.x as f64, point.y as f64);
-                bez_path.quad_to((c1.x as f64, c1.y as f64), (point.x as f64, point.y as f64));
-            }
-            PathSegment::CubicTo(c1, c2, point) => {
-                let cubic = CubicBez::new(
-                    current_point,
-                    (c1.x as f64, c1.y as f64).into(),
-                    (c2.x as f64, c2.y as f64).into(),
-                    (point.x as f64, point.y as f64).into(),
-                );
+    #[test]
+    fn svg_rectangle() {
+        // A simple SVG rectangle 100x50 at position (10,10)
+        let svg = r#"
+            <svg xmlns="http://www.w3.org/2000/svg" width="120" height="70">
+                <rect x="10" y="10" width="100" height="50"/>
+            </svg>"#
+            .to_string();
 
-                // Convert to quadratic Bézier curves
-                for (_, _, quad) in cubic.to_quads(ACCURACY) {
-                    let control_point = Point::new(quad.p1.x, quad.p1.y);
-                    current_point = Point::new(quad.p2.x, quad.p2.y);
-                    bez_path.quad_to(
-                        (control_point.x, control_point.y),
-                        (current_point.x, current_point.y),
-                    );
-                }
-            }
-            PathSegment::Close => {
-                bez_path.close_path();
-            }
-        }
+        let result = simplify_svg(svg).expect("failed to simplify SVG");
+        let bbox = bounding_box(&result);
+
+        assert_eq!(bbox, Rect::new(10.0, 10.0, 110.0, 60.0));
     }
 
-    if bez_path.is_empty() {
-        return None;
-    }
+    #[test]
+    fn svg_two_rectangles() {
+        // Two overlapping rectangles
+        let svg = r#"
+            <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+                <rect x="10" y="10" width="100" height="50"/>
+                <rect x="40" y="40" width="40" height="40"/>
+            </svg>"#
+            .to_string();
 
-    Some(bez_path)
+        let result = simplify_svg(svg).expect("failed to simplify SVG");
+        let bbox = bounding_box(&result);
+
+        assert_eq!(bbox, Rect::new(10.0, 10.0, 110.0, 80.0));
+    }
 }
