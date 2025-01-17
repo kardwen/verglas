@@ -30,6 +30,7 @@ fn get_icon_map() -> &'static IconMap {
 }
 
 define_icons! {
+    cat_outline => "cat-outline",
     cat_left => "cat-left",
     cat_right => "cat-right",
     book => "jam/book",

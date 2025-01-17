@@ -35,6 +35,7 @@ impl App {
                         icon::small_box(),
                         horizontal_space(),
                     ],
+                    row![icon::cat_right(), icon::cat_outline(), icon::cat_left()],
                 ]
                 .spacing(25),
             )

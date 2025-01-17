@@ -3,6 +3,8 @@ use usvg::{tiny_skia_path::PathSegment, Path};
 
 const ACCURACY: f64 = 0.01;
 
+use super::tessellation::apply_stroke;
+
 /// Returns the smallest rectangle that encloses all Bézier paths.
 pub fn bounding_box(bez_paths: &[BezPath]) -> Rect {
     bez_paths
@@ -14,7 +16,7 @@ pub fn bounding_box(bez_paths: &[BezPath]) -> Rect {
 
 /// Takes an usvg path and converts it to a Bézier curve
 /// where cubic segments have been replaced with quadratic segments.
-pub fn process_svg_path(svg_path: &Path) -> Option<BezPath> {
+pub fn process_svg_path(svg_path: &Path) -> Option<Vec<BezPath>> {
     let path_data = svg_path.data();
     let mut segments = path_data.segments();
     segments.set_auto_close(true);
@@ -63,7 +65,13 @@ pub fn process_svg_path(svg_path: &Path) -> Option<BezPath> {
         return None;
     }
 
-    Some(bez_path)
+    let result = if let Some(stroke) = svg_path.stroke() {
+        apply_stroke(bez_path, stroke, svg_path.fill())
+    } else {
+        vec![bez_path]
+    };
+
+    Some(result)
 }
 
 #[cfg(test)]

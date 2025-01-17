@@ -2,6 +2,7 @@ use kurbo::BezPath;
 use usvg::{Group, Node, Options, Tree};
 
 mod bezier;
+mod tessellation;
 
 pub use self::bezier::bounding_box;
 
@@ -25,8 +26,8 @@ fn visit_group(group: &Group, bez_paths: &mut Vec<BezPath>) {
     for node in group.children() {
         match *node {
             Node::Path(ref svg_path) => {
-                if let Some(path) = process_svg_path(svg_path) {
-                    bez_paths.push(path);
+                if let Some(mut path) = process_svg_path(svg_path) {
+                    bez_paths.append(&mut path);
                 }
             }
             Node::Group(ref group) => {
