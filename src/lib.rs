@@ -124,4 +124,4 @@ pub use crate::forge::make_font;
 
 #[cfg_attr(docsrs, doc(cfg(feature = "index")))]
 #[cfg(feature = "index")]
-pub use crate::index::{build_icon_map, IconMap};
+pub use crate::index::{build_icon_map, build_icon_map_from_bytes, IconMap};

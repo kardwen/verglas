@@ -20,8 +20,17 @@ pub fn build_icon_map(font_path: impl AsRef<Path>) -> Result<IconMap, Error> {
     // read font file
     let font_data = fs::read(font_path)?;
 
+    build_icon_map_from_bytes(font_data)
+}
+
+/// Returns a mapping of icon names to their assigned unicode values.
+///
+/// This function accepts the bytes of a TrueType font file and extracts the mapping between
+/// glyph names and their corresponding unicode values. This is useful for determining which
+/// unicode value to use for a specific icon glyph.
+pub fn build_icon_map_from_bytes(font_data: impl AsRef<[u8]>) -> Result<IconMap, Error> {
     // Parse font
-    let font = FontRef::new(&font_data)?;
+    let font = FontRef::new(font_data.as_ref())?;
 
     // Get the 'cmap' table which contains character to glyph mappings
     let cmap = font.cmap()?;
